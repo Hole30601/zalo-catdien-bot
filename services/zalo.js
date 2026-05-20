@@ -1,5 +1,5 @@
 const axios = require("axios");
-const { ACCESS_TOKEN, USER_ID } = require("../config");
+const { BOT_TOKEN, USER_ID } = require("../config");
 
 async function sendMessage(text) {
 
@@ -15,7 +15,7 @@ async function sendMessage(text) {
         },
         {
             headers: {
-                access_token: ACCESS_TOKEN
+                access_token: BOT_TOKEN
             }
         }
     );
