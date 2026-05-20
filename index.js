@@ -17,15 +17,58 @@ app.get("/", (req, res) => {
     res.status(200).send("Bot lịch cắt điện đang hoạt động");
 });
 
+// =========================
+// WEBHOOK ZALO
+// =========================
+app.post("/webhook", async (req, res) => {
+
+    console.log("========== WEBHOOK ==========");
+    console.log(
+        JSON.stringify(req.body, null, 2)
+    );
+    console.log("=============================");
+
+    // Thử lấy ID từ nhiều cấu trúc khác nhau
+    const userId =
+        req.body?.sender?.id ||
+        req.body?.from?.id ||
+        req.body?.user_id ||
+        req.body?.uid ||
+        req.body?.sender_id ||
+        "Không tìm thấy ID";
+
+    console.log("USER ID:", userId);
+
+    // Nếu muốn gửi thử thông báo tới user cố định
+    // thì bỏ comment dòng dưới
+    //
+    // await sendMessage(
+    //     `Đã nhận webhook từ ID: ${userId}`
+    // );
+
+    res.status(200).json({
+        success: true,
+        userId
+    });
+});
+
+// =========================
+// KIỂM TRA LỊCH CẮT ĐIỆN
+// =========================
 async function checkSchedule() {
+
     try {
-        const current = await getLichCatDien();
 
-        const old = loadData();
+        const current =
+            await getLichCatDien();
 
-        const newItems = current.filter(
-            item => !old.includes(item)
-        );
+        const old =
+            loadData();
+
+        const newItems =
+            current.filter(
+                item => !old.includes(item)
+            );
 
         if (newItems.length > 0) {
 
@@ -65,6 +108,7 @@ checkSchedule();
 cron.schedule(
     "*/10 * * * *",
     () => {
+
         console.log(
             "Đang kiểm tra lịch cắt điện..."
         );
@@ -77,7 +121,12 @@ const PORT =
     process.env.PORT || 3000;
 
 app.listen(PORT, () => {
+
     console.log(
         `Server chạy tại cổng ${PORT}`
+    );
+
+    console.log(
+        `Webhook: /webhook`
     );
 });
