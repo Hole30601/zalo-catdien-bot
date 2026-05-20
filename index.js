@@ -1,30 +1,31 @@
+const express = require("express");
 const cron = require("node-cron");
 
-const getLichCatDien =
-require("./services/scraper");
-
-const sendMessage =
-require("./services/zalo");
+const getLichCatDien = require("./services/scraper");
+const sendMessage = require("./services/zalo");
 
 const {
     loadData,
     saveData
 } = require("./utils/storage");
 
+const app = express();
+
+app.use(express.json());
+
+app.get("/", (req, res) => {
+    res.status(200).send("Bot lịch cắt điện đang hoạt động");
+});
+
 async function checkSchedule() {
-
     try {
+        const current = await getLichCatDien();
 
-        const current =
-            await getLichCatDien();
+        const old = loadData();
 
-        const old =
-            loadData();
-
-        const newItems =
-            current.filter(
-                item => !old.includes(item)
-            );
+        const newItems = current.filter(
+            item => !old.includes(item)
+        );
 
         if (newItems.length > 0) {
 
@@ -36,7 +37,7 @@ ${newItems.join("\n")}`;
             await sendMessage(message);
 
             console.log(
-                "Đã gửi thông báo"
+                `Đã gửi ${newItems.length} thông báo mới`
             );
 
             saveData(current);
@@ -50,13 +51,33 @@ ${newItems.join("\n")}`;
 
     } catch (err) {
 
-        console.error(err.message);
+        console.error(
+            "Lỗi kiểm tra:",
+            err.message
+        );
     }
 }
 
+// chạy ngay khi khởi động
 checkSchedule();
 
+// kiểm tra mỗi 10 phút
 cron.schedule(
     "*/10 * * * *",
-    checkSchedule
+    () => {
+        console.log(
+            "Đang kiểm tra lịch cắt điện..."
+        );
+
+        checkSchedule();
+    }
 );
+
+const PORT =
+    process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+    console.log(
+        `Server chạy tại cổng ${PORT}`
+    );
+});
