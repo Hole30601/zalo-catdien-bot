@@ -16,7 +16,9 @@ app.use(express.json());
 app.get("/", (req, res) => {
     res.status(200).send("Bot lịch cắt điện đang hoạt động");
 });
-
+app.get("/webhook", (req, res) => {
+    res.send("Webhook hoạt động");
+});
 // =========================
 // WEBHOOK ZALO
 // =========================
