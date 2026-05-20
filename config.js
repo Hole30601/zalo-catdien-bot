@@ -1,6 +1,5 @@
 module.exports = {
-    ACCESS_TOKEN: "ZALO_ACCESS_TOKEN",
-    USER_ID: "ZALO_USER_ID",
+    BOT_TOKEN: "1473026517432223818:zabyBKIlgCydSLgQHMjXlfhAJiokBykgtmsdlLYjrKZLDltsDIRcpJzrYDjksoJL",
 
     URL:
     "https://xemlichcatdien.com/lich-cat-dien-gia-binh-bac-ninh/"
