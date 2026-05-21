@@ -284,10 +284,12 @@ app.listen(PORT, () => {
     `Server chạy tại cổng ${PORT}`
   );
 
-  await setWebhook();
+  
 
   console.log(
     `Webhook: /webhook`
   );
 
 });
+
+setWebhook();
