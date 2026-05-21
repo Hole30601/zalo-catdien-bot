@@ -16,6 +16,10 @@ if(!admin.apps.length){
          privateKey:
          process.env.FB_PRIVATE_KEY
          .replace(/\\n/g, "\n")
+              
+console.log("PROJECT:", process.env.FB_PROJECT_ID);
+console.log("EMAIL:", process.env.FB_CLIENT_EMAIL);
+console.log("KEY:", !!process.env.FB_PRIVATE_KEY);
 
       }),
 
