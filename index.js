@@ -221,14 +221,13 @@ ${userId}`
         }
 
         const users =
-  getSubscribers();
+  await getSubscribers();
 
 for (const id of users) {
-
-  await sendMessageToUser(id,
+  await sendMessageToUser(
+    id,
     message
   );
-
 }
 
       }
@@ -339,13 +338,14 @@ else if (
   } else {
 
     const users =
-      getSubscribers();
+  await getSubscribers();
 
-    await sendMessageToUser(userId,
+await sendMessageToUser(
+  userId,
 `👥 Danh sách người nhận
 
 ${users.join("\n") || "Trống"}`
-    );
+);
 
   }
 
