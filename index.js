@@ -1,7 +1,7 @@
 const express = require("express");
 const cron = require("node-cron");
 
-const { BOT_TOKEN, USER_ID, ADMIN_ID } =
+const { BOT_TOKEN, ADMIN_ID } =
 require("./config");
 
 const getLichCatDien =
