@@ -1,5 +1,5 @@
 const axios = require("axios");
-const { BOT_TOKEN, USER_ID } = require("../config");
+const { BOT_TOKEN, USER_ID } = require("./config");
 
 
 async function setWebhook() {
