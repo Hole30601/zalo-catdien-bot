@@ -98,7 +98,7 @@ app.post("/webhook", async (req, res) => {
     .ref("users")
     .child(userId)
     .set({
-        chatId,
+        userId,
         updatedAt: Date.now()
          });
         
