@@ -14,7 +14,7 @@ async function setWebhook() {
                 `https://bot-api.zaloplatforms.com/bot${BOT_TOKEN}/setWebhook`,
                 {
                     url: webhookUrl,
-                    secret_token: "my-secret-key"
+                    secret_token: "1-x8wRUaEIj9ebX1-M"
                 }
             );
 
