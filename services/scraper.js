@@ -74,21 +74,28 @@ rowDate.setHours(
     0, 0, 0, 0
 );
 
-        const targetDate = new Date();
-targetDate.setHours(0, 0, 0, 0);
-
-// thông báo trước 3 ngày
-targetDate.setDate(
-    targetDate.getDate() + 3
+        
+const nowVN = new Date(
+    new Date().toLocaleString(
+        "en-US",
+        { timeZone: "Asia/Ho_Chi_Minh" }
+    )
 );
 
-if (
-    rowDate.getDate() !== targetDate.getDate() ||
-    rowDate.getMonth() !== targetDate.getMonth() ||
-    rowDate.getFullYear() !== targetDate.getFullYear()
-) {
-    return;
-}
+nowVN.setHours(0, 0, 0, 0);
+
+const diffDays = Math.floor(
+    (rowDate - nowVN) / 86400000
+);
+
+console.log({
+    dateText,
+    diffDays
+});
+
+        if(diffDays !== 3){
+            return;
+        }
         rows.push(
 `📅 ${dateText}
 🕒 ${time}
