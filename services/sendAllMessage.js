@@ -29,27 +29,21 @@ async function sendAllMessage(text) {
         try {
 
             // gửi tin nhắn
-            await axios.post(
-                `https://bot-api.zaloplatforms.com/bot${BOT_TOKEN}/sendMessage`,
-                {
-                    chat_id: userId,
-                    text
-                }
-            );
+            
 
             // gửi ảnh bên dưới nếu có link
-            if (PHOTO_URL) {
+            
 
                 await axios.post(
                     `https://bot-api.zaloplatforms.com/bot${BOT_TOKEN}/sendPhoto`,
                     {
                         chat_id: userId,
                         photo: PHOTO_URL,
-                        caption: "Ủng Hộ Tôi"
+                        caption: text
                     }
                 );
 
-            }
+            
 
             console.log(
                 "Đã gửi:",
