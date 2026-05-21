@@ -1,31 +1,40 @@
 const axios = require("axios");
-const { BOT_TOKEN, USER_ID } = require("../config");
+const { BOT_TOKEN } =
+    require("../config");
 
-async function sendMessage(text, chatId = USER_ID) {
-    try {
+const getAllUsers =
+    require("./getAllUsers");
 
-        const entrypoint =
-            `https://bot-api.zaloplatforms.com/bot${BOT_TOKEN}/sendMessage`;
+async function sendMessage(text) {
 
-        const res = await axios.post(
-            entrypoint,
-            {
-                chat_id: chatId,
-                text: text
-            }
-        );
+    const users =
+        await getAllUsers();
 
-        console.log("Đã gửi:", res.data);
-        return res.data;
+    for (const chatId of users) {
 
-    } catch (err) {
+        try {
 
-        console.error(
-            "Lỗi gửi tin nhắn:",
-            err.response?.data || err.message
-        );
+            await axios.post(
+                `https://bot-api.zaloplatforms.com/bot${BOT_TOKEN}/sendMessage`,
+                {
+                    chat_id: chatId,
+                    text
+                }
+            );
 
-        throw err;
+            console.log(
+                "Đã gửi:",
+                chatId
+            );
+
+        } catch (err) {
+
+            console.error(
+                chatId,
+                err.response?.data ||
+                err.message
+            );
+        }
     }
 }
 
