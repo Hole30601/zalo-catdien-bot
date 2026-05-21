@@ -8,23 +8,17 @@ async function getLichCatDien() {
 
     const $ = cheerio.load(data);
 
-    let rows = [];
+    console.log("TABLE:", $("table").length);
 
-   $("table tr").each((i, el) => {
+    console.log("TR:", $("tr").length);
 
-    const cols = $(el)
-        .find("td")
-        .map((_, td) => $(td).text().trim())
-        .get();
+    $("h2,h3,h4").each((i,e)=>{
+        console.log($(e).text().trim());
+    });
 
-    console.log(cols);
-
-    if (cols.length > 0) {
-        rows.push(cols.join(" | "));
-    }
-});
-
-    return rows;
+    return [];
 }
+
+
 
 module.exports = getLichCatDien;
