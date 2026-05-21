@@ -1,6 +1,6 @@
 const express = require("express");
 const cron = require("node-cron");
-const { BOT_TOKEN, USER_ID } = require("../config");
+const { BOT_TOKEN, USER_ID } = require("./config");
 const getLichCatDien = require("./services/scraper");
 const sendMessage = require("./services/zalo");
 const setWebhook =
