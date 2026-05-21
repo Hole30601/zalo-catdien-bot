@@ -6,7 +6,9 @@ const getAllUsers =
     require("../getAllUsers");
 
 async function sendMessage(text) {
-
+    
+console.log("=== SEND MESSAGE START ===");
+    
     const users =
         await getAllUsers();
 
