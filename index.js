@@ -13,6 +13,8 @@ require("./services/zalo");
 const setWebhook =
 require("./setWebhook");
 
+const db = require("./firebase");
+
 const {
   getSubscribers,
   addSubscriber,
@@ -56,6 +58,35 @@ app.get("/webhook", (req, res) => {
 
 });
 
+
+
+app.post("/webhook", async (req, res) => {
+
+    try {
+
+        const chatId =
+            req.body.message?.chat?.id;
+
+        if (chatId) {
+
+            await db
+                .collection("users")
+                .doc(chatId)
+                .set({
+                    chatId,
+                    updatedAt:
+                        new Date()
+                });
+        }
+
+        res.sendStatus(200);
+
+    } catch (err) {
+
+        console.error(err);
+        res.sendStatus(500);
+    }
+});
 // =========================
 // WEBHOOK BOT
 // =========================
