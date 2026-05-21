@@ -1,15 +1,31 @@
 const admin = require("firebase-admin");
 
-admin.initializeApp({
-    credential: admin.credential.cert({
-        projectId: process.env.FIREBASE_PROJECT_ID,
-        clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-        privateKey: process.env.FIREBASE_PRIVATE_KEY
-            .replace(/\\n/g, "\n")
-    }),
-    databaseURL: process.env.FIREBASE_DATABASE_URL
-});
+if(!admin.apps.length){
 
-const db = admin.database();
+     admin.initializeApp({
+ 
+      credential:
+      admin.credential.cert({
+
+         projectId:
+         process.env.FB_PROJECT_ID,
+
+         clientEmail:
+         process.env.FB_CLIENT_EMAIL,
+
+         privateKey:
+         process.env.FB_PRIVATE_KEY
+         .replace(/\\n/g, "\n")
+
+      }),
+
+      databaseURL:
+      process.env.FB_DB_URL
+
+   });
+}
+
+const db =
+admin.database();
 
 module.exports = db;
