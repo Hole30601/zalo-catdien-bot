@@ -14,6 +14,12 @@ const setWebhook =
 require("./setWebhook");
 
 const {
+  getSubscribers,
+  addSubscriber,
+  removeSubscriber
+} = require("./utils/subscribers");
+
+const {
   loadData,
   saveData
 } = require("./utils/storage");
@@ -149,12 +155,13 @@ Các lệnh:
 /start
 /help
 /id
-
-⚡ /kiemtra
+Điện Đóm ⚡️
+/kiemtra
 Kiểm tra lịch cắt điện hiện tại
 
-📢 /sendmes
-Gửi thông báo (admin)`
+Admin
+/sendmes
+Gửi thông báo`
         );
 
       }
@@ -167,7 +174,7 @@ Gửi thông báo (admin)`
       ) {
 
         await sendMessage(
-`🆔 ID của bạn:
+`ID của bạn:
 
 ${userId}`
         );
@@ -202,12 +209,117 @@ ${userId}`
 
         }
 
-        await sendMessage(
-          message
-        );
+        const users =
+  getSubscribers();
+
+for (const id of users) {
+
+  await sendMessage(
+    message,
+    id
+  );
+
+}
 
       }
 
+        // thêm người nhận
+else if (
+  text.startsWith("/adduser ")
+) {
+
+  if (
+    userId !== String(ADMIN_ID)
+  ) {
+
+    await sendMessage(
+      "❌ Bạn không phải admin."
+    );
+
+  } else {
+
+    const targetId =
+      text.replace(
+        "/adduser ",
+        ""
+      ).trim();
+
+    addSubscriber(
+      targetId
+    );
+
+    await sendMessage(
+`✅ Đã thêm người nhận:
+
+${targetId}`
+    );
+
+  }
+
+}
+
+  // xoá người nhận
+else if (
+  text.startsWith("/deluser ")
+) {
+
+  if (
+    userId !== String(ADMIN_ID)
+  ) {
+
+    await sendMessage(
+      "❌ Bạn không phải admin."
+    );
+
+  } else {
+
+    const targetId =
+      text.replace(
+        "/deluser ",
+        ""
+      ).trim();
+
+    removeSubscriber(
+      targetId
+    );
+
+    await sendMessage(
+`🗑️ Đã xoá:
+
+${targetId}`
+    );
+
+  }
+
+}
+  // danh sách người nhận
+else if (
+  text === "/users"
+) {
+
+  if (
+    userId !== String(ADMIN_ID)
+  ) {
+
+    await sendMessage(
+      "❌ Bạn không phải admin."
+    );
+
+  } else {
+
+    const users =
+      getSubscribers();
+
+    await sendMessage(
+`👥 Danh sách người nhận
+
+${users.join("\n") || "Trống"}`
+    );
+
+  }
+
+}
+  
       // =====================
       // GỬI THÔNG BÁO
       // =====================
@@ -282,10 +394,17 @@ async function checkSchedule() {
 
 ${newItems.join("\n")}`;
 
-      await sendMessage(
-        message
-      );
+      const users =
+  getSubscribers();
 
+for (const id of users) {
+
+  await sendMessage(
+    message,
+    id
+  );
+
+}
       console.log(
         "Đã gửi thông báo"
       );
