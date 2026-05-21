@@ -5,8 +5,11 @@ const {
     PHOTO_URL
 } = require("../config");
 
-const getSubscribers =
-    require("../getSubscribers");
+const {
+  getSubscribers,
+  addSubscriber,
+  removeSubscriber
+} = require("./utils/subscribers");
 
 async function sendAllMessage(text) {
 
