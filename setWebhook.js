@@ -7,7 +7,7 @@ async function setWebhook() {
     try {
 
         const webhookUrl =
-            "https://ten-app.onrender.com/webhook";
+            "https://zalo-catdien-bot.onrender.com/webhook";
 
         const response =
             await axios.post(
