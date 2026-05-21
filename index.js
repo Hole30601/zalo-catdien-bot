@@ -70,7 +70,7 @@ app.post("/webhook", async (req, res) => {
         if (chatId) {
 
             await db
-                .collection("users")
+                .ref("users")
                 .doc(chatId)
                 .set({
                     chatId,
