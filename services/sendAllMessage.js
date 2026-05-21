@@ -42,7 +42,7 @@ async function sendAllMessage(text) {
                     {
                         chat_id: userId,
                         photo: PHOTO_URL,
-                        caption: ""
+                        caption: "Ủng Hộ Tôi"
                     }
                 );
 
