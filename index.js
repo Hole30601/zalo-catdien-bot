@@ -55,6 +55,15 @@ cursor:pointer;
 
 <form method="POST" action="/send">
 
+
+<hr>
+
+<form method="POST" action="/check-now">
+<button type="submit">
+⚡ Kiểm tra lịch cắt điện ngay
+</button>
+</form>
+
 <textarea
 name="message"
 placeholder="Nhập nội dung..."
@@ -100,20 +109,43 @@ app.post("/send", async (req, res) => {
 // =========================
 // TEST
 // =========================
-app.get("/test", async (req, res) => {
+// =========================
+// KIỂM TRA NGAY VÀ GỬI
+// =========================
+app.post("/check-now", async (req, res) => {
 
   try {
 
-    await sendMessage(
-      "✅ Test gửi thành công"
-    );
+    const current =
+      await getLichCatDien();
 
-    res.send("Đã gửi");
+    if (!current || current.length === 0) {
 
-  } catch (e) {
+      return res.send(`
+        <h3>Không lấy được dữ liệu</h3>
+        <a href="/">Quay lại</a>
+      `);
+    }
 
-    res.status(500).send("Lỗi");
+    const message =
+`⚡ KIỂM TRA THỦ CÔNG
+
+${current.join("\n")}`;
+
+    await sendMessage(message);
+
+    res.send(`
+      <h3>✅ Đã gửi lịch cắt điện hiện tại</h3>
+      <a href="/">Quay lại</a>
+    `);
+
+  } catch (err) {
+
+    console.error(err);
+
+    res.status(500).send("Lỗi kiểm tra");
   }
+
 });
 
 // =========================
