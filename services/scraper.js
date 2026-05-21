@@ -53,7 +53,7 @@ async function getLichCatDien() {
             return;
         }
 
-        console.log("AREA:", area);
+        
         
 
         const match =
@@ -62,6 +62,17 @@ async function getLichCatDien() {
             );
 
         if (!match) return;
+
+        const d = Number(match[1]);
+const m = Number(match[2]);
+const y = Number(match[3]);
+
+const rowDate =
+    new Date(y, m - 1, d);
+
+rowDate.setHours(
+    0, 0, 0, 0
+);
 
         const targetDate = new Date();
 targetDate.setHours(0, 0, 0, 0);
