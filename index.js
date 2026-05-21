@@ -114,38 +114,19 @@ app.post("/send", async (req, res) => {
 // =========================
 app.post("/check-now", async (req, res) => {
 
-  try {
+  const current = await getLichCatDien();
 
-    const current =
-      await getLichCatDien();
-
-    if (!current || current.length === 0) {
-
-      return res.send(`
-        <h3>Không lấy được dữ liệu</h3>
-        <a href="/">Quay lại</a>
-      `);
-    }
-
-    const message =
+  const message =
 `⚡ KIỂM TRA THỦ CÔNG
 
 ${current.join("\n")}`;
 
-    await sendMessage(message);
+  console.log("CHECK NOW MESSAGE:");
+  console.log(message);
 
-    res.send(`
-      <h3>✅ Đã gửi lịch cắt điện hiện tại</h3>
-      <a href="/">Quay lại</a>
-    `);
+  await sendMessage(message);
 
-  } catch (err) {
-
-    console.error(err);
-
-    res.status(500).send("Lỗi kiểm tra");
-  }
-
+  res.send("OK");
 });
 
 // =========================
