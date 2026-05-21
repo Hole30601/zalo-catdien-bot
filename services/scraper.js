@@ -53,6 +53,9 @@ async function getLichCatDien() {
             return;
         }
 
+        console.log("AREA:", area);
+        
+
         const match =
             dateText.match(
                 /(\d{2})\/(\d{2})\/(\d{4})/
