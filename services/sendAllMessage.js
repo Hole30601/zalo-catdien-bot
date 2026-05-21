@@ -9,7 +9,7 @@ const {
   getSubscribers,
   addSubscriber,
   removeSubscriber
-} = require("./utils/subscribers");
+} = require("../utils/subscribers");
 
 async function sendAllMessage(text) {
 
