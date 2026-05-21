@@ -4,7 +4,7 @@ async function getAllUsers() {
 
     const snapshot =
         await db
-            .collection("users")
+            .ref("users")
             .get();
 
     return snapshot.docs.map(
