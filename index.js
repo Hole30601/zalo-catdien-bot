@@ -32,14 +32,14 @@ app.post("/webhook", async (req, res) => {
 
     // Thử lấy ID từ nhiều cấu trúc khác nhau
     const userId =
-        req.body?.sender?.id ||
-        req.body?.from?.id ||
-        req.body?.user_id ||
-        req.body?.uid ||
-        req.body?.sender_id ||
-        "Không tìm thấy ID";
+        req.body.message?.from?.id;
 
-    console.log("USER ID:", userId);
+    console.log(
+        "USER ID:",
+        userId || "Không tìm thấy ID"
+    );
+
+    
 
     // Nếu muốn gửi thử thông báo tới user cố định
     // thì bỏ comment dòng dưới
