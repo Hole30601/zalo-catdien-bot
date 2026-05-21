@@ -47,8 +47,8 @@ async function getLichCatDien() {
             area.toLowerCase();
 
         if (
-            !areaLower.includes("Nhân Thắng") &&
-            !areaLower.includes("Nhan Thang")
+            !areaLower.includes("Chi Nhị") &&
+            !areaLower.includes("Chi Nhi")
         ) {
             return;
         }
@@ -67,7 +67,7 @@ async function getLichCatDien() {
     );
 
 // Chỉ lấy lịch của ngày mai
-if (diffDays !== 1) {
+if (diffDays !== 3) {
     return;
 }
         rows.push(
