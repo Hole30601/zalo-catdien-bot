@@ -13,6 +13,9 @@ require("./services/zalo");
 const sendMessageToUser =
 require("./services/sendMessageToUser");
 
+const sendAllMessage =
+require("./services/sendAllMessage");
+
 
 const setWebhook =
 require("./setWebhook");
@@ -423,16 +426,8 @@ async function checkSchedule() {
 
 ${newItems.join("\n")}`;
 
-            const users =
-                await getSubscribers();
-
-            for (const id of users) {
-
-                await sendMessage(
-                    message,
-                    id
-                );
-            }
+            await sendAllMessage(message);
+            
 
             console.log(
                 "Đã gửi thông báo"
