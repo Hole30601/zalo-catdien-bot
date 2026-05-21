@@ -5,66 +5,209 @@ const getLichCatDien = require("./services/scraper");
 const sendMessage = require("./services/zalo");
 
 const {
-    loadData,
-    saveData
+  loadData,
+  saveData
 } = require("./utils/storage");
 
 const app = express();
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-
-app.get("/test", async (req, res) => {
-    try {
-        await sendMessage("✅ Test gửi tin nhắn thành công!");
-        res.send("Đã gửi");
-    } catch (err) {
-        console.error(err);
-        res.status(500).send("Lỗi");
-    }
-});
-
-app.listen(process.env.PORT || 3000);
-
-app.get("/", (req, res) => {
-    res.status(200).send("Bot lịch cắt điện đang hoạt động");
-});
-app.get("/webhook", (req, res) => {
-    res.send("Webhook hoạt động");
-});
 // =========================
-// WEBHOOK ZALO
+// GIAO DIỆN GỬI TIN NHẮN
+// =========================
+app.get("/", (req, res) => {
+  res.send(`
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>ZApps Bot</title>
+
+<style>
+body{
+font-family:Arial;
+max-width:600px;
+margin:40px auto;
+padding:20px;
+}
+
+textarea{
+width:100%;
+height:150px;
+padding:10px;
+}
+
+button{
+margin-top:10px;
+padding:12px 20px;
+cursor:pointer;
+}
+
+</style>
+</head>
+
+<body>
+
+<h2>Gửi tin nhắn Bot</h2>
+
+<form method="POST" action="/send">
+
+<textarea
+name="message"
+placeholder="Nhập nội dung..."
+required></textarea>
+
+<br>
+
+<button type="submit">
+Gửi tin nhắn
+</button>
+
+</form>
+
+</body>
+</html>
+`);
+});
+
+// =========================
+// GỬI TIN NHẮN TỪ WEB
+// =========================
+app.post("/send", async (req, res) => {
+
+  try {
+
+    const msg = req.body.message;
+
+    await sendMessage(msg);
+
+    res.send(`
+      <h3>✅ Đã gửi</h3>
+      <a href="/">Quay lại</a>
+    `);
+
+  } catch (e) {
+
+    console.error(e);
+
+    res.status(500).send("Lỗi gửi");
+  }
+});
+
+// =========================
+// TEST
+// =========================
+app.get("/test", async (req, res) => {
+
+  try {
+
+    await sendMessage(
+      "✅ Test gửi thành công"
+    );
+
+    res.send("Đã gửi");
+
+  } catch (e) {
+
+    res.status(500).send("Lỗi");
+  }
+});
+
+// =========================
+// WEBHOOK INFO
+// =========================
+app.get("/webhook", (req, res) => {
+
+  res.json({
+    success: true,
+    message: "Webhook hoạt động"
+  });
+
+});
+
+// =========================
+// WEBHOOK BOT ZAPPS
 // =========================
 app.post("/webhook", async (req, res) => {
 
-    console.log("========== WEBHOOK ==========");
-    console.log(
-        JSON.stringify(req.body, null, 2)
-    );
-    console.log("=============================");
-
-    // Thử lấy ID từ nhiều cấu trúc khác nhau
-    const userId =
-        req.body.message?.from?.id;
+  try {
 
     console.log(
-        "USER ID:",
-        userId || "Không tìm thấy ID"
+      JSON.stringify(
+        req.body,
+        null,
+        2
+      )
     );
 
-    
+    const event = req.body;
 
-    // Nếu muốn gửi thử thông báo tới user cố định
-    // thì bỏ comment dòng dưới
-    //
-    // await sendMessage(
-    //     `Đã nhận webhook từ ID: ${userId}`
-    // );
+    // user gửi tin nhắn
+    if (
+      event.message &&
+      event.message.text
+    ) {
 
-    res.status(200).json({
-        success: true,
+      const text =
+        event.message.text.trim();
+
+      const userId =
+        event.message.chat?.id ||
+        event.message.from?.id;
+
+      console.log(
+        "USER:",
         userId
-    });
+      );
+
+      console.log(
+        "TEXT:",
+        text
+      );
+
+      // ====================
+      // /start
+      // ====================
+      if (text === "/start") {
+
+        await sendMessage(
+          `👋 Xin chào!
+
+Tôi là bot thông báo lịch cắt điện.
+
+Các lệnh hỗ trợ:
+
+/start
+/help
+
+⚡ Bot sẽ gửi thông báo khi phát hiện lịch cắt điện mới.`
+        );
+      }
+
+      // ====================
+      // /help
+      // ====================
+      if (text === "/help") {
+
+        await sendMessage(
+          `Danh sách lệnh:
+
+/start
+/help`
+        );
+      }
+    }
+
+    res.sendStatus(200);
+
+  } catch (err) {
+
+    console.error(err);
+
+    res.sendStatus(200);
+  }
 });
 
 // =========================
@@ -72,76 +215,76 @@ app.post("/webhook", async (req, res) => {
 // =========================
 async function checkSchedule() {
 
-    try {
+  try {
 
-        const current =
-            await getLichCatDien();
+    const current =
+      await getLichCatDien();
 
-        const old =
-            loadData();
+    const old =
+      loadData();
 
-        const newItems =
-            current.filter(
-                item => !old.includes(item)
-            );
+    const newItems =
+      current.filter(
+        item => !old.includes(item)
+      );
 
-        if (newItems.length > 0) {
+    if (newItems.length > 0) {
 
-            const message =
+      const message =
 `⚡ Có lịch cắt điện mới
 
 ${newItems.join("\n")}`;
 
-            await sendMessage(message);
+      await sendMessage(message);
 
-            console.log(
-                `Đã gửi ${newItems.length} thông báo mới`
-            );
+      console.log(
+        "Đã gửi thông báo"
+      );
 
-            saveData(current);
+      saveData(current);
 
-        } else {
+    } else {
 
-            console.log(
-                "Không có thay đổi"
-            );
-        }
-
-    } catch (err) {
-
-        console.error(
-            "Lỗi kiểm tra:",
-            err.message
-        );
+      console.log(
+        "Không có thay đổi"
+      );
     }
+
+  } catch (err) {
+
+    console.error(
+      err.message
+    );
+  }
 }
 
-// chạy ngay khi khởi động
+// chạy ngay
 checkSchedule();
 
-// kiểm tra mỗi 10 phút
+// 10 phút/lần
 cron.schedule(
-    "*/10 * * * *",
-    () => {
+  "*/10 * * * *",
+  () => {
 
-        console.log(
-            "Đang kiểm tra lịch cắt điện..."
-        );
+    console.log(
+      "Đang kiểm tra..."
+    );
 
-        checkSchedule();
-    }
+    checkSchedule();
+  }
 );
 
 const PORT =
-    process.env.PORT || 3000;
+  process.env.PORT || 3000;
 
 app.listen(PORT, () => {
 
-    console.log(
-        `Server chạy tại cổng ${PORT}`
-    );
+  console.log(
+    `Server chạy tại cổng ${PORT}`
+  );
 
-    console.log(
-        `Webhook: /webhook`
-    );
+  console.log(
+    `Webhook: /webhook`
+  );
+
 });
