@@ -130,6 +130,10 @@ ${text}`
 Tôi là bot thông báo lịch cắt điện.
 
 /help 
+/dangky
+để nhận thông báo về lịch mất điện
+/huy
+để huỷ nhận thông báo về lịch mất điện
 
 Để Biết Thông Tin Các Lệnh`
         );
@@ -220,6 +224,27 @@ for (const id of users) {
 }
 
       }
+
+       else if (text === "/dangky") {
+
+  addSubscriber(userId);
+
+  await sendMessageToUser(
+    userId,
+    "✅ Đã đăng ký nhận thông báo lịch cắt điện."
+  );
+
+}
+         else if (text === "/huy") {
+
+  removeSubscriber(userId);
+
+  await sendMessageToUser(
+    userId,
+    "❌ Đã hủy nhận thông báo."
+  );
+
+}
 
         // thêm người nhận
 else if (
