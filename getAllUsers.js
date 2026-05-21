@@ -1,7 +1,6 @@
 const db = require("./firebase");
 
 async function getAllUsers() {
-
     const snapshot =
         await db.ref("users").get();
 
@@ -11,7 +10,7 @@ async function getAllUsers() {
         return [];
     }
 
-    return Object.values(data)
-        .map(user => user.chatId);
+    return Object.keys(data);
 }
+
 module.exports = getAllUsers;
