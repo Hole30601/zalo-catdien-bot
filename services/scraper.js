@@ -47,8 +47,8 @@ async function getLichCatDien() {
             area.toLowerCase();
 
         if (
-            !areaLower.includes("chi nhị") &&
-            !areaLower.includes("chi nhi")
+            !areaLower.includes("đông cứu") &&
+            !areaLower.includes("dong cuu")
         ) {
             return;
         }
@@ -93,7 +93,7 @@ console.log({
     diffDays
 });
 
-        if(diffDays !== 3){
+        if(diffDays !== 1){
             return;
         }
         rows.push(
