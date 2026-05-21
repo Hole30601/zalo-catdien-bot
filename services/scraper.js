@@ -4,7 +4,8 @@ const { URL } = require("../config");
 
 async function getLichCatDien() {
 
-    const { data } = await axios.get(URL);
+    const { data } =
+        await axios.get(URL);
 
     const $ = cheerio.load(data);
 
@@ -41,6 +42,17 @@ async function getLichCatDien() {
                 .replace("Lý do:", "")
                 .trim();
 
+        // Chỉ lấy các mục liên quan đến xã Đông Cứu
+        const areaLower =
+            area.toLowerCase();
+
+        if (
+            !areaLower.includes("Đông Cứu") &&
+            !areaLower.includes("Dong Cuu")
+        ) {
+            return;
+        }
+
         const match =
             dateText.match(
                 /(\d{2})\/(\d{2})\/(\d{4})/
@@ -48,23 +60,23 @@ async function getLichCatDien() {
 
         if (!match) return;
 
-        const d = Number(match[1]);
-        const m = Number(match[2]);
-        const y = Number(match[3]);
+        const diffDays =
+    Math.floor(
+        (rowDate - today) /
+        (1000 * 60 * 60 * 24)
+    );
 
-        const rowDate =
-            new Date(y, m - 1, d);
-
-        rowDate.setHours(0, 0, 0, 0);
-
-        // Chỉ lấy từ ngày mai trở đi
-        if (rowDate <= today) return;
-
+// Chỉ lấy lịch của ngày mai
+if (diffDays !== 1) {
+    return;
+}
         rows.push(
 `📅 ${dateText}
 🕒 ${time}
 📍 ${area}
-🔧 ${reason}`
+🔧 ${reason}
+
+⚠️ Thời gian cắt điện chỉ là kế hoạch dự kiến của đơn vị điện lực. Thực tế có thể cắt sớm hơn, muộn hơn hoặc thay đổi mà không báo trước.`
         );
 
     });
