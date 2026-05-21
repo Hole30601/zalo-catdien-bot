@@ -129,15 +129,9 @@ ${text}`
 
 Tôi là bot thông báo lịch cắt điện.
 
-Các lệnh:
+/help 
 
-/start
-/help
-/id
-/kiemtra
-
-(Admin)
-/sendmes`
+Để Biết Thông Tin Các Lệnh`
         );
 
       }
@@ -155,12 +149,15 @@ Các lệnh:
 /start
 /help
 /id
+
 Điện Đóm ⚡️
 /kiemtra
 Kiểm tra lịch cắt điện hiện tại
 
 Admin
 /sendmes
+/adduser
+/deluser
 Gửi thông báo`
         );
 
