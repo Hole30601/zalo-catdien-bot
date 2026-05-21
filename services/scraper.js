@@ -63,26 +63,19 @@ async function getLichCatDien() {
 
         if (!match) return;
 
-        const d = Number(match[1]);
-const m = Number(match[2]);
-const y = Number(match[3]);
+        const targetDate = new Date();
+targetDate.setHours(0, 0, 0, 0);
 
-const rowDate =
-    new Date(y, m - 1, d);
+// thông báo trước 3 ngày
+targetDate.setDate(
+    targetDate.getDate() + 3
+);
 
-rowDate.setHours(0, 0, 0, 0);
-
-const diffDays =
-    Math.round(
-        (rowDate - today) /
-        86400000
-    );
-console.log({
-    dateText,
-    diffDays
-});
-// Chỉ lấy lịch của ngày mai
-if (diffDays !== 3) {
+if (
+    rowDate.getDate() !== targetDate.getDate() ||
+    rowDate.getMonth() !== targetDate.getMonth() ||
+    rowDate.getFullYear() !== targetDate.getFullYear()
+) {
     return;
 }
         rows.push(
