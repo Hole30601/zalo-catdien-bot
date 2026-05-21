@@ -1,24 +1,19 @@
-const fs = require("fs");
+const db = require("../firebase");
 
-const FILE = "./data.json";
+const REF = "lichCatDien";
 
-function loadData() {
+async function loadData() {
 
-    if (!fs.existsSync(FILE)) {
-        return [];
-    }
+    const snapshot =
+        await db.ref(REF).once("value");
 
-    return JSON.parse(
-        fs.readFileSync(FILE, "utf8")
-    );
+    return snapshot.val() || [];
 }
 
-function saveData(data) {
+async function saveData(data) {
 
-    fs.writeFileSync(
-        FILE,
-        JSON.stringify(data, null, 2)
-    );
+    // Ghi đè toàn bộ dữ liệu cũ
+    await db.ref(REF).set(data);
 }
 
 module.exports = {
