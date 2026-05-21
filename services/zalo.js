@@ -7,36 +7,35 @@ const getAllUsers =
 
 async function sendMessage(text) {
     
-console.log("=== SEND MESSAGE START ===");
+
     
     const users =
         await getAllUsers();
 
-console.log("Users:", users);
-console.log("Tổng:", users.length);
+
     
 
-    for (const chatId of users) {
+    for (const userId of users) {
 
         try {
 
             await axios.post(
                 `https://bot-api.zaloplatforms.com/bot${BOT_TOKEN}/sendMessage`,
                 {
-                    chat_id: chatId,
+                    chat_id: userId,
                     text
                 }
             );
 
             console.log(
                 "Đã gửi:",
-                chatId
+                userId
             );
 
         } catch (err) {
 
             console.error(
-                chatId,
+                userId,
                 err.response?.data ||
                 err.message
             );
