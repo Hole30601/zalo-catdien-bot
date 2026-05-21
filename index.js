@@ -10,6 +10,10 @@ require("./services/scraper");
 const sendMessage =
 require("./services/zalo");
 
+const sendMessageToUser =
+require("./services/sendMessageToUser");
+
+
 const setWebhook =
 require("./setWebhook");
 
@@ -129,7 +133,7 @@ ${text}`
       // =====================
       if (text === "/start") {
 
-        await sendMessage(
+        await sendMessageToUser(userId,
 `👋 Xin chào
 
 Tôi là bot thông báo lịch cắt điện.
@@ -152,7 +156,7 @@ Tôi là bot thông báo lịch cắt điện.
         text === "/help"
       ) {
 
-        await sendMessage(
+        await sendMessageToUser(userId,
 `Danh sách lệnh
 
 /start
@@ -180,7 +184,7 @@ Gửi thông báo`
         text === "/id"
       ) {
 
-        await sendMessage(
+        await sendMessageToUser(userId,
 `ID của bạn:
 
 ${userId}`
@@ -221,7 +225,7 @@ ${userId}`
 
 for (const id of users) {
 
-  await sendMessage(
+  await sendMessageToUser(id,
     message
   );
 
@@ -259,7 +263,7 @@ else if (
     userId !== String(ADMIN_ID)
   ) {
 
-    await sendMessage(
+    await sendMessageToUser(userId,
       "❌ Bạn không phải admin."
     );
 
@@ -275,7 +279,7 @@ else if (
       targetId
     );
 
-    await sendMessage(
+    await sendMessageToUser(userId,
 `✅ Đã thêm người nhận:
 
 ${targetId}`
@@ -294,7 +298,7 @@ else if (
     userId !== String(ADMIN_ID)
   ) {
 
-    await sendMessage(
+    await sendMessageToUser(userId,
       "❌ Bạn không phải admin."
     );
 
@@ -310,7 +314,7 @@ else if (
       targetId
     );
 
-    await sendMessage(
+    await sendMessageToUser(userId,
 `🗑️ Đã xoá:
 
 ${targetId}`
@@ -328,7 +332,7 @@ else if (
     userId !== String(ADMIN_ID)
   ) {
 
-    await sendMessage(
+    await sendMessageToUser(userId,
       "❌ Bạn không phải admin."
     );
 
@@ -337,7 +341,7 @@ else if (
     const users =
       getSubscribers();
 
-    await sendMessage(
+    await sendMessageToUser(userId,
 `👥 Danh sách người nhận
 
 ${users.join("\n") || "Trống"}`
@@ -361,7 +365,7 @@ ${users.join("\n") || "Trống"}`
           )
         ) {
 
-          await sendMessage(
+          await sendMessageToUser(userId,
             "❌ Bạn không phải admin."
           );
 
@@ -369,7 +373,7 @@ ${users.join("\n") || "Trống"}`
 
           waitingBroadcast = true;
 
-          await sendMessage(
+          await sendMessageToUser(userId,
 `📢 Bạn muốn gửi thông báo nào?
 
 Hãy nhập nội dung tin nhắn tiếp theo.`
@@ -426,7 +430,7 @@ ${newItems.join("\n")}`;
 
 for (const id of users) {
 
-  await sendMessage(
+  await sendMessageToUser(id,
     message
   );
 
