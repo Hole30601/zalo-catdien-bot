@@ -1,6 +1,9 @@
 const axios = require("axios");
-const { BOT_TOKEN } =
-    require("../config");
+
+const {
+    BOT_TOKEN,
+    PHOTO_URL
+} = require("../config");
 
 const getSubscribers =
     require("../getSubscribers");
@@ -22,6 +25,7 @@ async function sendAllMessage(text) {
 
         try {
 
+            // gửi tin nhắn
             await axios.post(
                 `https://bot-api.zaloplatforms.com/bot${BOT_TOKEN}/sendMessage`,
                 {
@@ -29,6 +33,20 @@ async function sendAllMessage(text) {
                     text
                 }
             );
+
+            // gửi ảnh bên dưới nếu có link
+            if (PHOTO_URL) {
+
+                await axios.post(
+                    `https://bot-api.zaloplatforms.com/bot${BOT_TOKEN}/sendPhoto`,
+                    {
+                        chat_id: userId,
+                        photo: PHOTO_URL,
+                        caption: ""
+                    }
+                );
+
+            }
 
             console.log(
                 "Đã gửi:",
@@ -48,4 +66,5 @@ async function sendAllMessage(text) {
     }
 }
 
-module.exports = sendAllMessage;
+module.exports =
+    sendAllMessage;
