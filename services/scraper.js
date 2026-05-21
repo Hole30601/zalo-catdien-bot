@@ -77,7 +77,10 @@ const diffDays =
         (rowDate - today) /
         86400000
     );
-
+console.log({
+    dateText,
+    diffDays
+});
 // Chỉ lấy lịch của ngày mai
 if (diffDays !== 3) {
     return;
