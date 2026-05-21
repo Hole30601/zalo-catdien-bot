@@ -3,7 +3,7 @@ const { BOT_TOKEN } =
     require("../config");
 
 const getAllUsers =
-    require("./getAllUsers");
+    require("../getAllUsers");
 
 async function sendMessage(text) {
 
