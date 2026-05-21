@@ -3,7 +3,8 @@ const cron = require("node-cron");
 
 const getLichCatDien = require("./services/scraper");
 const sendMessage = require("./services/zalo");
-
+const setWebhook =
+    require("./setWebhook");
 const {
   loadData,
   saveData
@@ -282,6 +283,8 @@ app.listen(PORT, () => {
   console.log(
     `Server chạy tại cổng ${PORT}`
   );
+
+  await setWebhook();
 
   console.log(
     `Webhook: /webhook`
