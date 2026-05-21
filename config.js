@@ -1,8 +1,10 @@
 module.exports = {
-    BOT_TOKEN: "1473026517432223818:zabyBKIlgCydSLgQHMjXlfhAJiokBykgtmsdlLYjrKZLDltsDIRcpJzrYDjksoJL",
-
-    URL: "https://xemlichcatdien.com/lich-cat-dien-gia-binh-bac-ninh/",
-
+    BOT_TOKEN:
+    process.env.BOT_TOKEN,
+    
+    URL:
+    process.env.URL_SEX,
+    
     USER_ID: "3111c131df6d36336f7c",
     
     ADMIN_ID:
