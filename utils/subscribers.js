@@ -1,50 +1,37 @@
-const fs = require("fs");
+const db = require("../firebase");
 
-const FILE = "subscribers.json";
+const REF = "subscribers";
 
-function getSubscribers() {
-  try {
-    return JSON.parse(
-      fs.readFileSync(FILE, "utf8")
-    );
-  } catch {
-    return [];
-  }
+async function getSubscribers() {
+
+    const snapshot =
+        await db.ref(REF).once("value");
+
+    const data =
+        snapshot.val() || {};
+
+    return Object.keys(data);
 }
 
-function saveSubscribers(data) {
-  fs.writeFileSync(
-    FILE,
-    JSON.stringify(data, null, 2)
-  );
+async function addSubscriber(id) {
+
+    await db
+        .ref(`${REF}/${id}`)
+        .set({
+            createdAt:
+                Date.now()
+        });
 }
 
-function addSubscriber(id) {
+async function removeSubscriber(id) {
 
-  const users =
-    getSubscribers();
-
-  if (!users.includes(id)) {
-
-    users.push(id);
-
-    saveSubscribers(users);
-
-  }
-}
-
-function removeSubscriber(id) {
-
-  const users =
-    getSubscribers().filter(
-      x => x !== id
-    );
-
-  saveSubscribers(users);
+    await db
+        .ref(`${REF}/${id}`)
+        .remove();
 }
 
 module.exports = {
-  getSubscribers,
-  addSubscriber,
-  removeSubscriber
+    getSubscribers,
+    addSubscriber,
+    removeSubscriber
 };
