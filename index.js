@@ -53,16 +53,15 @@ cursor:pointer;
 
 <h2>Gửi tin nhắn Bot</h2>
 
-<form method="POST" action="/send">
-
-
-<hr>
-
 <form method="POST" action="/check-now">
 <button type="submit">
 ⚡ Kiểm tra lịch cắt điện ngay
 </button>
 </form>
+
+<hr>
+
+<form method="POST" action="/send">
 
 <textarea
 name="message"
