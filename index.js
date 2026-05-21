@@ -70,13 +70,12 @@ app.post("/webhook", async (req, res) => {
         if (chatId) {
 
             await db
-                .ref("users")
-                .doc(chatId)
-                .set({
-                    chatId,
-                    updatedAt:
-                        new Date()
-                });
+    .ref("users")
+    .child(chatId)
+    .set({
+        chatId,
+        updatedAt: Date.now()
+         });
         }
 
         res.sendStatus(200);
@@ -119,15 +118,7 @@ app.post("/webhook", async (req, res) => {
           ""
         );
 
-      console.log(
-        "USER:",
-        userId
-      );
-
-      console.log(
-        "TEXT:",
-        text
-      );
+      
 
       // =====================
       // ADMIN ĐANG NHẬP THÔNG BÁO
