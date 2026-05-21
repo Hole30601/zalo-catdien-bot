@@ -47,8 +47,8 @@ async function getLichCatDien() {
             area.toLowerCase();
 
         if (
-            !areaLower.includes("Chi Nhị") &&
-            !areaLower.includes("Chi Nhi")
+            !areaLower.includes("chi nhị") &&
+            !areaLower.includes("chi nhi")
         ) {
             return;
         }
@@ -60,10 +60,19 @@ async function getLichCatDien() {
 
         if (!match) return;
 
-        const diffDays =
-    Math.floor(
+        const d = Number(match[1]);
+const m = Number(match[2]);
+const y = Number(match[3]);
+
+const rowDate =
+    new Date(y, m - 1, d);
+
+rowDate.setHours(0, 0, 0, 0);
+
+const diffDays =
+    Math.round(
         (rowDate - today) /
-        (1000 * 60 * 60 * 24)
+        86400000
     );
 
 // Chỉ lấy lịch của ngày mai
