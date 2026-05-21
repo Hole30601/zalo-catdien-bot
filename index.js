@@ -230,7 +230,7 @@ for (const id of users) {
   addSubscriber(userId);
 
   await sendMessageToUser(
-    userId,
+    userId, 
     "✅ Đã đăng ký nhận thông báo lịch cắt điện."
   );
 
