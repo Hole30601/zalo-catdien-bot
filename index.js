@@ -60,32 +60,7 @@ app.get("/webhook", (req, res) => {
 
 
 
-app.post("/webhook", async (req, res) => {
 
-    try {
-
-        const chatId =
-            req.body.message?.chat?.id;
-
-        if (chatId) {
-
-            await db
-    .ref("users")
-    .child(chatId)
-    .set({
-        chatId,
-        updatedAt: Date.now()
-         });
-        }
-
-        res.sendStatus(200);
-
-    } catch (err) {
-
-        console.error(err);
-        res.sendStatus(500);
-    }
-});
 // =========================
 // WEBHOOK BOT
 // =========================
@@ -118,7 +93,15 @@ app.post("/webhook", async (req, res) => {
           ""
         );
 
-      
+
+      await db
+    .ref("users")
+    .child(userId)
+    .set({
+        chatId,
+        updatedAt: Date.now()
+         });
+        }
 
       // =====================
       // ADMIN ĐANG NHẬP THÔNG BÁO
