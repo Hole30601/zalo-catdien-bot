@@ -13,6 +13,19 @@ const app = express();
 
 app.use(express.json());
 
+
+app.get("/test", async (req, res) => {
+    try {
+        await sendMessage("✅ Test gửi tin nhắn thành công!");
+        res.send("Đã gửi");
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Lỗi");
+    }
+});
+
+app.listen(process.env.PORT || 3000);
+
 app.get("/", (req, res) => {
     res.status(200).send("Bot lịch cắt điện đang hoạt động");
 });
