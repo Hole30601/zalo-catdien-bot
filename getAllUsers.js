@@ -11,7 +11,7 @@ async function getAllUsers() {
     }
 
     return Object.values(data)
-        .map(user => user.chatId)
+        .map(user => user.userId)
         .filter(Boolean);
 }
 
