@@ -222,8 +222,7 @@ ${userId}`
 for (const id of users) {
 
   await sendMessage(
-    message,
-    id
+    message
   );
 
 }
@@ -428,8 +427,7 @@ ${newItems.join("\n")}`;
 for (const id of users) {
 
   await sendMessage(
-    message,
-    id
+    message
   );
 
 }
