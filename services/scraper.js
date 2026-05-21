@@ -10,17 +10,19 @@ async function getLichCatDien() {
 
     let rows = [];
 
-    $("table tr").each((i, el) => {
+   $("table tr").each((i, el) => {
 
-        const cols = $(el)
-            .find("td")
-            .map((_, td) => $(td).text().trim())
-            .get();
+    const cols = $(el)
+        .find("td")
+        .map((_, td) => $(td).text().trim())
+        .get();
 
-        if (cols.length > 0) {
-            rows.push(cols.join(" | "));
-        }
-    });
+    console.log(cols);
+
+    if (cols.length > 0) {
+        rows.push(cols.join(" | "));
+    }
+});
 
     return rows;
 }
