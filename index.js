@@ -1,10 +1,18 @@
 const express = require("express");
 const cron = require("node-cron");
-const { BOT_TOKEN, USER_ID } = require("./config");
-const getLichCatDien = require("./services/scraper");
-const sendMessage = require("./services/zalo");
+
+const { BOT_TOKEN, USER_ID, ADMIN_ID } =
+require("./config");
+
+const getLichCatDien =
+require("./services/scraper");
+
+const sendMessage =
+require("./services/zalo");
+
 const setWebhook =
-    require("./setWebhook");
+require("./setWebhook");
+
 const {
   loadData,
   saveData
@@ -13,119 +21,21 @@ const {
 const app = express();
 
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(
+  express.urlencoded({
+    extended: true
+  })
+);
+
+let waitingBroadcast = false;
 
 // =========================
-// GIAO DIỆN GỬI TIN NHẮN
+// ROOT
 // =========================
 app.get("/", (req, res) => {
-  res.send(`
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="utf-8">
-<title>ZApps Bot</title>
 
-<style>
-body{
-font-family:Arial;
-max-width:600px;
-margin:40px auto;
-padding:20px;
-}
+  res.send("Bot đang hoạt động");
 
-textarea{
-width:100%;
-height:150px;
-padding:10px;
-}
-
-button{
-margin-top:10px;
-padding:12px 20px;
-cursor:pointer;
-}
-
-</style>
-</head>
-
-<body>
-
-<h2>Gửi tin nhắn Bot</h2>
-
-<form method="POST" action="/check-now">
-<button type="submit">
-⚡ Kiểm tra lịch cắt điện ngay
-</button>
-</form>
-
-<hr>
-
-<form method="POST" action="/send">
-
-<textarea
-name="message"
-placeholder="Nhập nội dung..."
-required></textarea>
-
-<br>
-
-<button type="submit">
-Gửi tin nhắn
-</button>
-
-</form>
-
-</body>
-</html>
-`);
-});
-
-// =========================
-// GỬI TIN NHẮN TỪ WEB
-// =========================
-app.post("/send", async (req, res) => {
-
-  try {
-
-    const msg = req.body.message;
-
-    await sendMessage(msg);
-
-    res.send(`
-      <h3>✅ Đã gửi</h3>
-      <a href="/">Quay lại</a>
-    `);
-
-  } catch (e) {
-
-    console.error(e);
-
-    res.status(500).send("Lỗi gửi");
-  }
-});
-
-// =========================
-// TEST
-// =========================
-// =========================
-// KIỂM TRA NGAY VÀ GỬI
-// =========================
-app.post("/check-now", async (req, res) => {
-
-  const current = await getLichCatDien();
-
-  const message =
-`⚡ KIỂM TRA THỦ CÔNG
-
-${current.join("\n")}`;
-
-  console.log("CHECK NOW MESSAGE:");
-  console.log(message);
-
-  await sendMessage(message);
-
-  res.send("OK");
 });
 
 // =========================
@@ -141,7 +51,7 @@ app.get("/webhook", (req, res) => {
 });
 
 // =========================
-// WEBHOOK BOT ZAPPS
+// WEBHOOK BOT
 // =========================
 app.post("/webhook", async (req, res) => {
 
@@ -157,7 +67,6 @@ app.post("/webhook", async (req, res) => {
 
     const event = req.body;
 
-    // user gửi tin nhắn
     if (
       event.message &&
       event.message.text
@@ -167,8 +76,11 @@ app.post("/webhook", async (req, res) => {
         event.message.text.trim();
 
       const userId =
-        event.message.chat?.id ||
-        event.message.from?.id;
+        String(
+          event.message.chat?.id ||
+          event.message.from?.id ||
+          ""
+        );
 
       console.log(
         "USER:",
@@ -180,37 +92,154 @@ app.post("/webhook", async (req, res) => {
         text
       );
 
-      // ====================
-      // /start
-      // ====================
+      // =====================
+      // ADMIN ĐANG NHẬP THÔNG BÁO
+      // =====================
+      if (
+        waitingBroadcast &&
+        userId === String(ADMIN_ID) &&
+        !text.startsWith("/")
+      ) {
+
+        waitingBroadcast = false;
+
+        await sendMessage(
+`📢 THÔNG BÁO
+
+${text}`
+        );
+
+        return res.sendStatus(200);
+
+      }
+
+      // =====================
+      // START
+      // =====================
       if (text === "/start") {
 
         await sendMessage(
-          `👋 Xin chào!
+`👋 Xin chào
 
 Tôi là bot thông báo lịch cắt điện.
 
-Các lệnh hỗ trợ:
+Các lệnh:
 
 /start
 /help
+/id
+/kiemtra
 
-⚡ Bot sẽ gửi thông báo khi phát hiện lịch cắt điện mới.`
+(Admin)
+/sendmes`
         );
+
       }
 
-      // ====================
-      // /help
-      // ====================
-      if (text === "/help") {
+      // =====================
+      // HELP
+      // =====================
+      else if (
+        text === "/help"
+      ) {
 
         await sendMessage(
-          `Danh sách lệnh:
+`Danh sách lệnh
 
 /start
-/help`
+/help
+/id
+
+⚡ /kiemtra
+Kiểm tra lịch cắt điện hiện tại
+
+📢 /sendmes
+Gửi thông báo (admin)`
         );
+
       }
+
+      // =====================
+      // XEM ID
+      // =====================
+      else if (
+        text === "/id"
+      ) {
+
+        await sendMessage(
+`🆔 ID của bạn:
+
+${userId}`
+        );
+
+      }
+
+      // =====================
+      // KIỂM TRA THỦ CÔNG
+      // =====================
+      else if (
+        text === "/kiemtra"
+      ) {
+
+        const current =
+          await getLichCatDien();
+
+        let message =
+          "⚡ KIỂM TRA THỦ CÔNG\n\n";
+
+        if (
+          !current ||
+          current.length === 0
+        ) {
+
+          message +=
+            "Không có lịch cắt điện.";
+
+        } else {
+
+          message +=
+            current.join("\n");
+
+        }
+
+        await sendMessage(
+          message
+        );
+
+      }
+
+      // =====================
+      // GỬI THÔNG BÁO
+      // =====================
+      else if (
+        text === "/sendmes"
+      ) {
+
+        if (
+          userId !==
+          String(
+            ADMIN_ID
+          )
+        ) {
+
+          await sendMessage(
+            "❌ Bạn không phải admin."
+          );
+
+        } else {
+
+          waitingBroadcast = true;
+
+          await sendMessage(
+`📢 Bạn muốn gửi thông báo nào?
+
+Hãy nhập nội dung tin nhắn tiếp theo.`
+          );
+
+        }
+
+      }
+
     }
 
     res.sendStatus(200);
@@ -220,7 +249,9 @@ Các lệnh hỗ trợ:
     console.error(err);
 
     res.sendStatus(200);
+
   }
+
 });
 
 // =========================
@@ -238,17 +269,22 @@ async function checkSchedule() {
 
     const newItems =
       current.filter(
-        item => !old.includes(item)
+        item =>
+          !old.includes(item)
       );
 
-    if (newItems.length > 0) {
+    if (
+      newItems.length > 0
+    ) {
 
       const message =
 `⚡ Có lịch cắt điện mới
 
 ${newItems.join("\n")}`;
 
-      await sendMessage(message);
+      await sendMessage(
+        message
+      );
 
       console.log(
         "Đã gửi thông báo"
@@ -261,6 +297,7 @@ ${newItems.join("\n")}`;
       console.log(
         "Không có thay đổi"
       );
+
     }
 
   } catch (err) {
@@ -268,13 +305,15 @@ ${newItems.join("\n")}`;
     console.error(
       err.message
     );
+
   }
+
 }
 
 // chạy ngay
 checkSchedule();
 
-// 10 phút/lần
+// mỗi 10 phút
 cron.schedule(
   "*/10 * * * *",
   () => {
@@ -284,24 +323,26 @@ cron.schedule(
     );
 
     checkSchedule();
+
   }
 );
 
 const PORT =
   process.env.PORT || 3000;
 
-app.listen(PORT, () => {
+app.listen(
+  PORT,
+  () => {
 
-  console.log(
-    `Server chạy tại cổng ${PORT}`
-  );
+    console.log(
+      `Server chạy tại cổng ${PORT}`
+    );
 
-  
+    console.log(
+      "Webhook: /webhook"
+    );
 
-  console.log(
-    `Webhook: /webhook`
-  );
+    setWebhook();
 
-});
-
-setWebhook();
+  }
+);
