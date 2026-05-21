@@ -3,5 +3,7 @@ module.exports = {
 
     URL: "https://xemlichcatdien.com/lich-cat-dien-gia-binh-bac-ninh/",
 
-    USER_ID: "3111c131df6d36336f7c" // ID Zalo cần nhận thông báo
+    USER_ID: "3111c131df6d36336f7c",
+    
+    ADMIN_ID: process.env.ADMIN_ID
 };
