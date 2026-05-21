@@ -47,8 +47,8 @@ async function getLichCatDien() {
             area.toLowerCase();
 
         if (
-            !areaLower.includes("Đông Cứu") &&
-            !areaLower.includes("Dong Cuu")
+            !areaLower.includes("Nhân Thắng") &&
+            !areaLower.includes("Nhan Thang")
         ) {
             return;
         }
