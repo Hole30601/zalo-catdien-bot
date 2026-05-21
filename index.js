@@ -158,6 +158,7 @@ Admin
 /sendmes
 /adduser
 /deluser
+/users
 Gửi thông báo`
         );
 
