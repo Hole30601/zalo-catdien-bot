@@ -10,6 +10,10 @@ async function sendMessage(text) {
     const users =
         await getAllUsers();
 
+console.log("Users:", users);
+console.log("Tổng:", users.length);
+    
+
     for (const chatId of users) {
 
         try {
