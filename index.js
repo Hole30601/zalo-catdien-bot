@@ -400,63 +400,57 @@ Hãy nhập nội dung tin nhắn tiếp theo.`
 // =========================
 // KIỂM TRA LỊCH CẮT ĐIỆN
 // =========================
+
 async function checkSchedule() {
 
-  try {
+    try {
 
-    const current =
-      await getLichCatDien();
+        const current =
+            await getLichCatDien();
 
-    const old =
-      loadData();
+        const old =
+            await loadData();
 
-    const newItems =
-      current.filter(
-        item =>
-          !old.includes(item)
-      );
+        const newItems =
+            current.filter(
+                item => !old.includes(item)
+            );
 
-    if (
-      newItems.length > 0
-    ) {
+        if (newItems.length > 0) {
 
-      const message =
+            const message =
 `⚡ Có lịch cắt điện mới
 
 ${newItems.join("\n")}`;
 
-      const users =
-  getSubscribers();
+            const users =
+                await getSubscribers();
 
-for (const id of users) {
+            for (const id of users) {
 
-  await sendMessageToUser(id,
-    message
-  );
+                await sendMessage(
+                    message,
+                    id
+                );
+            }
 
-}
-      console.log(
-        "Đã gửi thông báo"
-      );
+            console.log(
+                "Đã gửi thông báo"
+            );
 
-      saveData(current);
+            await saveData(current);
 
-    } else {
+        } else {
 
-      console.log(
-        "Không có thay đổi"
-      );
+            console.log(
+                "Không có thay đổi"
+            );
+        }
 
+    } catch (err) {
+
+        console.error(err);
     }
-
-  } catch (err) {
-
-    console.error(
-      err.message
-    );
-
-  }
-
 }
 
 // chạy ngay
