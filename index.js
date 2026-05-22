@@ -86,7 +86,7 @@ async function handleMessage(userId, text) {
 
       waitingBroadcast = false;
 
-      await sendAllMessage(
+      await sendMessage(
 `📢 THÔNG BÁO
 
 ${text}`
