@@ -1,21 +1,25 @@
 const axios = require("axios");
-const { BOT_TOKEN } = require("./config");
+const { BOT_TOKEN } =
+require("./config");
 
-async function startPolling(handleMessage) {
+async function startPolling(
+  handleMessage
+) {
 
   while (true) {
 
     try {
 
       const entrypoint =
-        `https://bot-api.zaloplatforms.com/bot${BOT_TOKEN}/getUpdates`;
+`https://bot-api.zaloplatforms.com/bot${BOT_TOKEN}/getUpdates`;
 
-      const res = await axios.post(
-        entrypoint,
-        {
-          timeout: 30
-        }
-      );
+      const res =
+        await axios.post(
+          entrypoint,
+          {
+            timeout: 30
+          }
+        );
 
       if (
         !res.data?.ok ||
@@ -63,7 +67,6 @@ async function startPolling(handleMessage) {
     } catch (err) {
 
       console.error(
-        "Polling lỗi:",
         err.response?.data ||
         err.message
       );
