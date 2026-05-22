@@ -17,8 +17,8 @@ const sendAllMessage =
 require("./services/sendAllMessage");
 
 
-const setWebhook =
-require("./setWebhook");
+const startPolling =
+require("./polling");
 
 const db = require("./firebase");
 
@@ -69,336 +69,324 @@ app.get("/webhook", (req, res) => {
 
 
 // =========================
-// WEBHOOK BOT
-// =========================
-app.post("/webhook", async (req, res) => {
+// WEBHOOK BOTasync function handleMessage(userId, text) {
 
   try {
 
-    console.log(
-      JSON.stringify(
-        req.body,
-        null,
-        2
-      )
-    );
-
-    const event = req.body;
-
-    if (
-      event.message &&
-      event.message.text
-    ) {
-
-      const text =
-        event.message.text.trim();
-
-      const userId =
-        String(
-          event.message.chat?.id ||
-          event.message.from?.id ||
-          ""
-        );
-
-
-      await db
-    .ref("users")
-    .child(userId)
-    .set({
+    await db
+      .ref("users")
+      .child(userId)
+      .set({
         userId,
         updatedAt: Date.now()
-         });
-        
+      });
 
-      // =====================
-      // ADMIN ĐANG NHẬP THÔNG BÁO
-      // =====================
-      if (
-        waitingBroadcast &&
-        userId === String(ADMIN_ID) &&
-        !text.startsWith("/")
-      ) {
+    // =====================
+    // ADMIN ĐANG NHẬP THÔNG BÁO
+    // =====================
+    if (
+      waitingBroadcast &&
+      userId === String(ADMIN_ID) &&
+      !text.startsWith("/")
+    ) {
 
-        waitingBroadcast = false;
+      waitingBroadcast = false;
 
-        await sendMessage(
+      await sendAllMessage(
 `📢 THÔNG BÁO
 
 ${text}`
-        );
+      );
 
-        return res.sendStatus(200);
+      await sendMessageToUser(
+        userId,
+        "✅ Đã gửi thông báo tới tất cả người nhận."
+      );
 
-      }
+      return;
+    }
 
-      // =====================
-      // START
-      // =====================
-      if (text === "/start") {
+    // =====================
+    // START
+    // =====================
+    if (text === "/start") {
 
-        await sendMessageToUser(userId,
+      await sendMessageToUser(
+        userId,
 `👋 Xin chào
 
 Tôi là bot thông báo lịch cắt điện.
 
-/help 
+/help
+Xem danh sách lệnh
+
 /dangky
-để nhận thông báo về lịch mất điện
+Đăng ký nhận thông báo
+
 /huy
-để huỷ nhận thông báo về lịch mất điện
+Hủy nhận thông báo`
+      );
 
-Để Biết Thông Tin Các Lệnh`
-        );
+    }
 
-      }
+    // =====================
+    // HELP
+    // =====================
+    else if (text === "/help") {
 
-      // =====================
-      // HELP
-      // =====================
-      else if (
-        text === "/help"
-      ) {
-
-        await sendMessageToUser(userId,
-`Danh sách lệnh
+      await sendMessageToUser(
+        userId,
+`📖 Danh sách lệnh
 
 /start
 /help
 /id
 
-Điện Đóm ⚡️
+⚡ Điện Đóm
+
 /kiemtra
 Kiểm tra lịch cắt điện hiện tại
 
-Admin
+/dangky
+Đăng ký nhận thông báo
+
+/huy
+Hủy nhận thông báo
+
+👑 Admin
+
 /sendmes
-/adduser
-/deluser
-/users
-Gửi thông báo`
-        );
+/adduser ID
+/deluser ID
+/users`
+      );
 
-      }
+    }
 
-      // =====================
-      // XEM ID
-      // =====================
-      else if (
-        text === "/id"
-      ) {
+    // =====================
+    // ID
+    // =====================
+    else if (text === "/id") {
 
-        await sendMessageToUser(userId,
-`ID của bạn:
+      await sendMessageToUser(
+        userId,
+`ID của bạn
 
 ${userId}`
+      );
+
+    }
+
+    // =====================
+    // KIỂM TRA
+    // =====================
+    else if (text === "/kiemtra") {
+
+      const current =
+        await getLichCatDien();
+
+      let message =
+        "⚡ LỊCH CẮT ĐIỆN HIỆN TẠI\n\n";
+
+      if (
+        !current ||
+        current.length === 0
+      ) {
+
+        message +=
+          "Không có lịch cắt điện.";
+
+      } else {
+
+        message +=
+          current.join("\n");
+
+      }
+
+      await sendMessageToUser(
+        userId,
+        message
+      );
+
+    }
+
+    // =====================
+    // ĐĂNG KÝ
+    // =====================
+    else if (text === "/dangky") {
+
+      await addSubscriber(userId);
+
+      await sendMessageToUser(
+        userId,
+        "✅ Đã đăng ký nhận thông báo lịch cắt điện."
+      );
+
+    }
+
+    // =====================
+    // HỦY
+    // =====================
+    else if (text === "/huy") {
+
+      await removeSubscriber(userId);
+
+      await sendMessageToUser(
+        userId,
+        "❌ Đã hủy nhận thông báo."
+      );
+
+    }
+
+    // =====================
+    // ADD USER
+    // =====================
+    else if (
+      text.startsWith("/adduser ")
+    ) {
+
+      if (
+        userId !== String(ADMIN_ID)
+      ) {
+
+        await sendMessageToUser(
+          userId,
+          "❌ Bạn không phải admin."
         );
 
-      }
+      } else {
 
-      // =====================
-      // KIỂM TRA THỦ CÔNG
-      // =====================
-      else if (
-        text === "/kiemtra"
-      ) {
+        const targetId =
+          text.replace(
+            "/adduser ",
+            ""
+          ).trim();
 
-        const current =
-          await getLichCatDien();
+        await addSubscriber(
+          targetId
+        );
 
-        let message =
-          "⚡ KIỂM TRA THỦ CÔNG\n\n";
-
-        if (
-          !current ||
-          current.length === 0
-        ) {
-
-          message +=
-            "Không có lịch cắt điện.";
-
-        } else {
-
-          message +=
-            current.join("\n");
-
-        }
-
-        const users =
-  await getSubscribers();
-
-for (const id of users) {
-  await sendMessageToUser(
-    id,
-    message
-  );
-}
-
-      }
-
-       else if (text === "/dangky") {
-
-  addSubscriber(userId);
-
-  await sendMessageToUser(
-    userId, 
-    "✅ Đã đăng ký nhận thông báo lịch cắt điện."
-  );
-
-}
-         else if (text === "/huy") {
-
-  removeSubscriber(userId);
-
-  await sendMessageToUser(
-    userId,
-    "❌ Đã hủy nhận thông báo."
-  );
-
-}
-
-        // thêm người nhận
-else if (
-  text.startsWith("/adduser ")
-) {
-
-  if (
-    userId !== String(ADMIN_ID)
-  ) {
-
-    await sendMessageToUser(userId,
-      "❌ Bạn không phải admin."
-    );
-
-  } else {
-
-    const targetId =
-      text.replace(
-        "/adduser ",
-        ""
-      ).trim();
-
-    addSubscriber(
-      targetId
-    );
-
-    await sendMessageToUser(userId,
-`✅ Đã thêm người nhận:
+        await sendMessageToUser(
+          userId,
+`✅ Đã thêm người nhận
 
 ${targetId}`
-    );
-
-  }
-
-}
-
-  // xoá người nhận
-else if (
-  text.startsWith("/deluser ")
-) {
-
-  if (
-    userId !== String(ADMIN_ID)
-  ) {
-
-    await sendMessageToUser(userId,
-      "❌ Bạn không phải admin."
-    );
-
-  } else {
-
-    const targetId =
-      text.replace(
-        "/deluser ",
-        ""
-      ).trim();
-
-    removeSubscriber(
-      targetId
-    );
-
-    await sendMessageToUser(userId,
-`🗑️ Đã xoá:
-
-${targetId}`
-    );
-
-  }
-
-}
-  // danh sách người nhận
-else if (
-  text === "/users"
-) {
-
-  if (
-    userId !== String(ADMIN_ID)
-  ) {
-
-    await sendMessageToUser(userId,
-      "❌ Bạn không phải admin."
-    );
-
-  } else {
-
-    const users =
-  await getSubscribers();
-
-await sendMessageToUser(
-  userId,
-`👥 Danh sách người nhận
-
-${users.join("\n") || "Trống"}`
-);
-
-  }
-
-}
-  
-      // =====================
-      // GỬI THÔNG BÁO
-      // =====================
-      else if (
-        text === "/sendmes"
-      ) {
-
-        if (
-          userId !==
-          String(
-            ADMIN_ID
-          )
-        ) {
-
-          await sendMessageToUser(userId,
-            "❌ Bạn không phải admin."
-          );
-
-        } else {
-
-          waitingBroadcast = true;
-
-          await sendMessageToUser(userId,
-`📢 Bạn muốn gửi thông báo nào?
-
-Hãy nhập nội dung tin nhắn tiếp theo.`
-          );
-
-        }
+        );
 
       }
 
     }
 
-    res.sendStatus(200);
+    // =====================
+    // DEL USER
+    // =====================
+    else if (
+      text.startsWith("/deluser ")
+    ) {
+
+      if (
+        userId !== String(ADMIN_ID)
+      ) {
+
+        await sendMessageToUser(
+          userId,
+          "❌ Bạn không phải admin."
+        );
+
+      } else {
+
+        const targetId =
+          text.replace(
+            "/deluser ",
+            ""
+          ).trim();
+
+        await removeSubscriber(
+          targetId
+        );
+
+        await sendMessageToUser(
+          userId,
+`🗑️ Đã xóa
+
+${targetId}`
+        );
+
+      }
+
+    }
+
+    // =====================
+    // USERS
+    // =====================
+    else if (text === "/users") {
+
+      if (
+        userId !== String(ADMIN_ID)
+      ) {
+
+        await sendMessageToUser(
+          userId,
+          "❌ Bạn không phải admin."
+        );
+
+      } else {
+
+        const users =
+          await getSubscribers();
+
+        await sendMessageToUser(
+          userId,
+`👥 Danh sách người nhận
+
+${users.length
+  ? users.join("\n")
+  : "Trống"}`
+        );
+
+      }
+
+    }
+
+    // =====================
+    // SEND MESSAGE
+    // =====================
+    else if (
+      text === "/sendmes"
+    ) {
+
+      if (
+        userId !== String(ADMIN_ID)
+      ) {
+
+        await sendMessageToUser(
+          userId,
+          "❌ Bạn không phải admin."
+        );
+
+      } else {
+
+        waitingBroadcast = true;
+
+        await sendMessageToUser(
+          userId,
+`📢 Hãy nhập nội dung thông báo cần gửi cho tất cả người nhận.`
+        );
+
+      }
+
+    }
 
   } catch (err) {
 
-    console.error(err);
-
-    res.sendStatus(200);
+    console.error(
+      "handleMessage:",
+      err
+    );
 
   }
 
-});
+}
 
 // =========================
 // KIỂM TRA LỊCH CẮT ĐIỆN
@@ -468,19 +456,14 @@ cron.schedule(
 const PORT =
   process.env.PORT || 3000;
 
-app.listen(
-  PORT,
-  () => {
+app.listen(PORT, () => {
 
-    console.log(
-      `Server chạy tại cổng ${PORT}`
-    );
+  console.log(
+    `Server chạy tại cổng ${PORT}`
+  );
 
-    console.log(
-      "Webhook: /webhook"
-    );
+  startPolling(
+    handleMessage
+  );
 
-    setWebhook();
-
-  }
-);
+});
