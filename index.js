@@ -55,21 +55,15 @@ app.get("/", (req, res) => {
 
 // =========================
 // WEBHOOK INFO
-// =========================
-app.get("/webhook", (req, res) => {
-
-  res.json({
-    success: true,
-    message: "Webhook hoạt động"
-  });
-
-});
+// ========================
 
 
 
 
 // =========================
-// WEBHOOK BOTasync function handleMessage(userId, text) {
+// WEBHOOK BOT
+
+async function handleMessage(userId, text) {
 
   try {
 
